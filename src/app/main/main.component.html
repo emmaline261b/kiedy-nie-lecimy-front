@@ -1,0 +1,50 @@
+<div class="container main">
+    <div class="main-title">
+        Wybierz termin i cel podróży:
+    </div>
+    <div class="dropdowns">
+        <mat-form-field appearance="outline">
+            <mat-label>Wybierz datę</mat-label>
+            <input matInput
+                [matDatepicker]="picker"
+                [(ngModel)]="selectedDate"
+                [min]="minDate">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Wybierz kraj</mat-label>
+            <mat-select [(ngModel)]="selectedCountry">
+                <mat-option *ngFor="let country of countries" [value]="country">
+                    {{ country }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <div class="button-container">
+            <button
+                mat-flat-button
+                color="primary"
+                (click)="checkCatastrophe()">
+                Sprawdź zagrożenia!
+            </button>
+        </div>
+    </div>
+
+    <div class="selections" *ngIf="selectedDate || selectedCountry">
+        <div class="selections_item" *ngIf="selectedDate">Wybrano datę: {{ selectedDate | date:'dd-MM-yyyy' }}</div>
+        <div class="selections_item" *ngIf="selectedCountry">Wybrano kraj: {{ selectedCountry }}</div>
+    </div>
+
+    <div class="catastrophe-check">
+        <div class="response" *ngIf="responseMessage">
+            <p>{{ responseMessage }}</p>
+        </div>
+    </div>
+
+
+
+    <div class="main-chart">
+        <app-map></app-map>
+    </div>
+</div>
