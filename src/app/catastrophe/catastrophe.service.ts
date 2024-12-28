@@ -16,7 +16,7 @@ import { Observable } from 'rxjs';
 })
 export class CatastropheService {
 
-    private endpoint = '/checkCatastrophe.html';
+    private endpoint = '/checkCatastrophe';
 
     constructor(private http: HttpClient) {}
 
