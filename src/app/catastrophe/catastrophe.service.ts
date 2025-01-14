@@ -16,12 +16,21 @@ import { Observable } from 'rxjs';
 })
 export class CatastropheService {
 
-    private endpoint = '/checkCatastrophe';
+    private endpoint = 'http://127.0.0.1:5000/predict';
 
     constructor(private http: HttpClient) {}
 
     checkCatastrophe(date: Date, country: string): Observable<any> {
-        return this.http.post<any>(this.endpoint, { date, country });
+        const dateString = this.formatDateToYYYYMMDD(date);
+        return this.http.post<any>(this.endpoint, { date: dateString, country: country });
+    }
+
+
+    private formatDateToYYYYMMDD(date: Date): string {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 }
 

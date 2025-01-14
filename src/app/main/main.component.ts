@@ -9,6 +9,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import {CatastropheService} from '../catastrophe/catastrophe.service';
 
+export interface Catastrophe {
+    name: string;
+    probability: number
+}
 
 @Component({
   standalone: true,
@@ -47,13 +51,22 @@ export class MainComponent {
         'Zambia', 'Zimbabwe'
     ];
 
+    public catastrophes: Catastrophe[] = [];
+
     constructor(private catastropheService: CatastropheService) {}
 
     checkCatastrophe(): void {
         if (this.selectedDate && this.selectedCountry) {
             this.catastropheService.checkCatastrophe(this.selectedDate, this.selectedCountry).subscribe(
                 (response) => {
-                    this.responseMessage = 'Wynik: ' + JSON.stringify(response);
+                    if (response && response.response) {
+                        this.catastrophes = response.response.map((item: any) => ({
+                            name: item.disaster,
+                            probability: parseFloat(item.probability),
+                        }));
+                    } else {
+                        this.responseMessage = 'Brak wyników.';
+                    }
                 },
                 (error) => {
                     this.responseMessage = 'Błąd! Coś poszło nie tak! ';

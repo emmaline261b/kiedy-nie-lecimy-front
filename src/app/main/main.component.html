@@ -21,7 +21,7 @@
                 </mat-option>
             </mat-select>
         </mat-form-field>
-        <div class="button-container">
+        <div *ngIf="catastrophes.length === 0" class="button-container">
             <button
                 mat-flat-button
                 color="primary"
@@ -30,21 +30,20 @@
             </button>
         </div>
     </div>
-
-    <div class="selections" *ngIf="selectedDate || selectedCountry">
-        <div class="selections_item" *ngIf="selectedDate">Wybrano datę: {{ selectedDate | date:'dd-MM-yyyy' }}</div>
-        <div class="selections_item" *ngIf="selectedCountry">Wybrano kraj: {{ selectedCountry }}</div>
-    </div>
-
-    <div class="catastrophe-check">
-        <div class="response" *ngIf="responseMessage">
-            <p>{{ responseMessage }}</p>
-        </div>
-    </div>
-
-
-
     <div class="main-chart">
         <app-map></app-map>
+    </div>
+    <div class="responses">
+        <div *ngIf="catastrophes.length > 0">
+            <h3>Lista przewidywanych katastrof:</h3>
+            <ul>
+                <li *ngFor="let catastrophe of catastrophes">
+                    <strong>{{ catastrophe.name }}</strong>: {{ catastrophe.probability | number: '1.2-2' }}%
+                </li>
+            </ul>
+        </div>
+        <div *ngIf="catastrophes.length === 0 && responseMessage">
+            <p>{{ responseMessage }}</p>
+        </div>
     </div>
 </div>
