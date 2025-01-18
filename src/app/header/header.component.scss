@@ -1,25 +1,26 @@
 .header {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  flex-flow: wrap;
-  align-items: center;
-  margin: 1rem;
-  gap: 2rem;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-flow: wrap;
+    align-items: center;
+    margin: 1rem;
+    gap: 2rem;
 }
 
 .header-logo {
-  height: 100px;
-  width: auto;
+    height: 100px;
+    width: auto;
 }
 
 .header-title {
-  position: relative;
-  display: flex;
-  flex-grow: 1;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(48px, 4vw, 24px);
-  color: #000000;
-  margin-right: 100px;
+    position: relative;
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(64px, 4vw, 32px);
+    font-family: 'Corinthia', cursive;
+    color: #000000;
+    margin-right: 100px;
 }

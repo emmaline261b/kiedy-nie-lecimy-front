@@ -1,63 +1,81 @@
-import { Component } from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {MapComponent} from '../map/map.component';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MapComponent } from '../map/map.component';
 import { FormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
-import {CatastropheService} from '../catastrophe/catastrophe.service';
+import { CatastropheService } from '../catastrophe/catastrophe.service';
+import { Country, COUNTRIES } from '../shared/country-data';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
 
 export interface Catastrophe {
     name: string;
-    probability: number
+    probability: number;
 }
 
 @Component({
-  standalone: true,
-  selector: 'app-main',
-  imports: [ CommonModule, FormsModule, MapComponent, MatDatepickerModule, MatFormFieldModule,
-      MatSelectModule, MatInputModule, MatNativeDateModule],
-  templateUrl: './main.component.html',
-  styleUrl: './main.component.scss'
+    standalone: true,
+    selector: 'app-main',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MapComponent,
+        MatDatepickerModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        MatInputModule,
+        MatNativeDateModule,
+        MatAutocompleteModule
+    ],
+    templateUrl: './main.component.html',
+    styleUrls: ['./main.component.scss']
 })
-export class MainComponent {
-    selectedCountry: string | undefined;
+export class MainComponent implements OnInit {
+
+    countries: Country[] = [];
+    filteredCountries: Country[] = [];
+    searchText: string = '';
+    selectedCountry: Country | undefined;
+
+    minDate: Date = new Date(1999, 12);
     selectedDate: Date | undefined;
-    minDate: Date = new Date();
-    responseMessage: string | undefined;
 
-    countries: string[] = [
-        'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan',
-        'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia',
-        'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Cabo Verde', 'Cambodia', 'Cameroon',
-        'Canada', 'Central African Republic', 'Chad', 'Chile', 'China', 'Colombia', 'Comoros', 'Congo', 'Costa Rica', 'Croatia',
-        'Cuba', 'Cyprus', 'Czech Republic', 'Denmark', 'Djibouti', 'Dominica', 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador',
-        'Equatorial Guinea', 'Eritrea', 'Estonia', 'Eswatini', 'Ethiopia', 'Fiji', 'Finland', 'France', 'Gabon', 'Gambia',
-        'Georgia', 'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti',
-        'Honduras', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy',
-        'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kiribati', 'Korea', 'Kosovo', 'Kuwait', 'Kyrgyzstan',
-        'Laos', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Madagascar',
-        'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania', 'Mauritius', 'Mexico', 'Micronesia',
-        'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco', 'Mozambique', 'Myanmar', 'Namibia', 'Nauru', 'Nepal',
-        'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria', 'North Macedonia', 'Norway', 'Oman', 'Pakistan', 'Palau',
-        'Palestine', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar', 'Romania',
-        'Russia', 'Rwanda', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'Samoa', 'San Marino', 'Sao Tome and Principe', 'Saudi Arabia', 'Senegal',
-        'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'Solomon Islands', 'Somalia', 'South Africa', 'South Sudan',
-        'Spain', 'Sri Lanka', 'Sudan', 'Suriname', 'Sweden', 'Switzerland', 'Syria', 'Tajikistan', 'Tanzania', 'Thailand',
-        'Timor-Leste', 'Togo', 'Tonga', 'Trinidad and Tobago', 'Tunisia', 'Turkey', 'Turkmenistan', 'Tuvalu', 'Uganda', 'Ukraine',
-        'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Uzbekistan', 'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam', 'Yemen',
-        'Zambia', 'Zimbabwe'
-    ];
+    responseMessage: string | undefined; // Wiadomość odpowiedzi
+    public catastrophes: Catastrophe[] = []; // Lista katastrof
 
-    public catastrophes: Catastrophe[] = [];
+
 
     constructor(private catastropheService: CatastropheService) {}
 
+    ngOnInit(): void {
+        this.countries = COUNTRIES;
+        this.filteredCountries = [...this.countries];
+    }
+
+    filterCountries(): void {
+        const search = this.searchText.toLowerCase();
+        this.filteredCountries = this.countries.filter(
+            (country) =>
+                country.name_pl.toLowerCase().includes(search) ||
+                country.name.toLowerCase().includes(search)
+        );
+    }
+
+    onCountrySelect(country: Country): void {
+        this.selectedCountry = country;
+        this.catastrophes = [{ name: country.name_pl, probability: 1 }];
+    }
+
+    displayCountry(country: Country | null): string {
+        return country ? country.name_pl : '';
+    }
+
     checkCatastrophe(): void {
         if (this.selectedDate && this.selectedCountry) {
-            this.catastropheService.checkCatastrophe(this.selectedDate, this.selectedCountry).subscribe(
+            this.catastropheService.checkCatastrophe(this.selectedDate, this.selectedCountry.name).subscribe(
                 (response) => {
                     if (response && response.response) {
                         this.catastrophes = response.response.map((item: any) => ({
@@ -69,7 +87,7 @@ export class MainComponent {
                     }
                 },
                 (error) => {
-                    this.responseMessage = 'Błąd! Coś poszło nie tak! ';
+                    this.responseMessage = 'Błąd! Coś poszło nie tak!';
                 }
             );
         } else {

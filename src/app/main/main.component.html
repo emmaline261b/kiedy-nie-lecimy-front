@@ -15,13 +15,14 @@
 
         <mat-form-field appearance="outline">
             <mat-label>Wybierz kraj</mat-label>
-            <mat-select [(ngModel)]="selectedCountry">
-                <mat-option *ngFor="let country of countries" [value]="country">
-                    {{ country }}
-                </mat-option>
-            </mat-select>
+                <input matInput placeholder="Szukaj..." [(ngModel)]="searchText" (ngModelChange)="filterCountries()" name="search" [matAutocomplete]="auto" />
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCountry" (optionSelected)="onCountrySelect($event.option.value)">
+                    <mat-option *ngFor="let country of filteredCountries" [value]="country">
+                        {{ country.name_pl }}
+                    </mat-option>
+                </mat-autocomplete>
         </mat-form-field>
-        <div *ngIf="catastrophes.length === 0" class="button-container">
+        <div class="button-container">
             <button
                 mat-flat-button
                 color="primary"
@@ -31,7 +32,10 @@
         </div>
     </div>
     <div class="main-chart">
-        <app-map></app-map>
+        <app-map
+        [catastrophes]="catastrophes"
+        [selectedCountry]="selectedCountry">
+        </app-map>
     </div>
     <div class="responses">
         <div *ngIf="catastrophes.length > 0">
